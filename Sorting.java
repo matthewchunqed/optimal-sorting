@@ -2,8 +2,7 @@ import java.util.Arrays;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 public class Sorting {
     // replace with your 
@@ -27,32 +26,31 @@ public class Sorting {
      */
     public static void parallelSort (float[] data) {
 
-/*    HashMap<Integer, Float> map = new HashMap<Integer, Float>();
-    int NUM_THREADS = 100;
-    Thread[] threads = new Thread[NUM_THREADS];
-	// replace this with your method!
-	int[] checker = new int[1_000_000_000];
-    AtomicInteger index = new AtomicInteger(0);
-    for (int i = 0; i < NUM_THREADS; i++) {
-		threads[i] = new Thread(new RThread(data, index, i));
-        threads[i].start();
-	}
-    */
+    int length = 16777216;
+    AtomicIntegerArray checker = new AtomicIntegerArray(length);
+  /*  float temp;
 
-    HashMap<Integer, Float> map = new HashMap<Integer, Float>();
-	int[] checker = new int[16777216];
-    float temp;
     for(int i=0; i<data.length; i++){
         temp = data[i]*16777216;
         checker[(int)temp]++;
-        map.put((int)temp, data[i]);
-    }
+    } */
+
+    int NUM_THREADS = 2;
+    Thread[] threads = new Thread[NUM_THREADS];
+    
+	// initialize threads
+	for (int i = 0; i < NUM_THREADS; i++) {
+		threads[i] = new Thread(new RThread(i*(data.length/NUM_THREADS), (i+1)*(data.length/NUM_THREADS), checker, data));
+	}
 
     int index = 0;
-    for(int i=0; i<checker.length; i++){
-        if(checker[i] > 0){
-            for(int j=0; j<checker[i]; j++){
-                data[index] = map.get(i);
+    int cursor;
+    for(int i=0; i<length; i++){
+        cursor = checker.get(i);
+        if(cursor > 0){
+            for(int j=0; j<cursor; j++){
+                data[index] = ((float)i)/16777216;
+                //data[index] = map.get(i);
                 index++;
             }
         }
