@@ -40,18 +40,21 @@ public class Sorting {
     */
 
     HashMap<Integer, Float> map = new HashMap<Integer, Float>();
-	float[] checker = new float[2_147_000_000];
+	int[] checker = new int[16777216];
     float temp;
     for(int i=0; i<data.length; i++){
-        temp = data[i]*2_147_000_000;
-        checker[temp] = data[i];
+        temp = data[i]*16777216;
+        checker[(int)temp]++;
+        map.put((int)temp, data[i]);
     }
 
     int index = 0;
     for(int i=0; i<checker.length; i++){
         if(checker[i] > 0){
-            data[index] = checker[i];
-            index++;
+            for(int j=0; j<checker[i]; j++){
+                data[index] = map.get(i);
+                index++;
+            }
         }
     }
 
