@@ -2,7 +2,7 @@ import java.util.Arrays;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 public class Sorting {
     // replace with your 
@@ -28,24 +28,49 @@ public class Sorting {
      */
 
     public static void parallelSort (float[] data) {
-        
-	int[] checker = new int[16777216];
-    float temp;
-    for(int i=0; i<data.length; i++){
-        temp = data[i]*16777216;
-        checker[(int)(data[i]*16777216)]++;
-    }
+    long time = System.nanoTime();
 
-    int index = 0;
-    for(int i=0; i<checker.length; i++){
-        if(checker[i] > 0){
-            for(int j=0; j<checker[i]; j++){
-                data[index] = ((float)i)/16777216;
-                index++;
-            }
+    int NUM_THREADS_MAX = 8;
+	int NUM_THREADS = 8;
+    AtomicIntegerArray count = new AtomicIntegerArray(NUM_THREADS_MAX+1);
+    Thread[] threads = new Thread[NUM_THREADS_MAX];
+    AtomicIntegerArray checker = new AtomicIntegerArray(16777216);
+    for(int i=0; i<NUM_THREADS; i++){
+        threads[i] = new Thread(new RThread(data, i, checker, NUM_THREADS, count));
+    }
+    for(int i=0; i<NUM_THREADS; i++){
+        threads[i].start();
+    }
+    System.out.println((System.nanoTime() - time) / 1_000_000);
+    try{
+        for(int i=0; i<NUM_THREADS; i++){
+            threads[i].join();
         }
-    }
+    }catch(Exception e){
 
+    }
+    System.out.println((System.nanoTime() - time) / 1_000_000);
+
+    int start = 0;
+    for(int i=0; i<NUM_THREADS_MAX; i++){
+        start += count.get(i);
+        threads[i] = new Thread(new SThread(data, i, checker, NUM_THREADS_MAX, start));
+    }
+    for(int i=0; i<NUM_THREADS_MAX; i++){
+        threads[i].start();
+    }
+    System.out.println((System.nanoTime() - time) / 1_000_000);
+    //1300 ms between here
+    try{
+        for(int i=0; i<NUM_THREADS_MAX; i++){
+            threads[i].join();
+        }
+    }catch(Exception e){
+
+    }
+    //and here
+    System.out.println((System.nanoTime() - time) / 1_000_000);
+    System.out.println();
 
     }
 

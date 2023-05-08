@@ -1,51 +1,37 @@
+import java.util.concurrent.atomic.AtomicIntegerArray;
+
 public class RThread implements Runnable {
 
+    private AtomicIntegerArray checker;
     private int regionMin;
     private int regionMax;
-    private int[] checker = new int[1_000_000_000];
-    private HashMap<Integer, Float> map = new HashMap<Integer, Float>();
-    private float[] data;
-    private AtomicInteger index;
     private int uniqueID;
+    private float[] data;
+    private int[] count;
+    private AtomicIntegerArray shared;
 
-    public RThread(float[] data, AtomicInteger index, int uniqueID) {
-		this.regionMin = regionMin;
-        this.regionMax = regionMax;
-        this.data = data;
-        this.index = index;
+    public RThread(float[] data, int uniqueID, AtomicIntegerArray checker, int NUM_THREADS, AtomicIntegerArray shared) {
+        this.checker = checker;
         this.uniqueID = uniqueID;
+        this.regionMin = uniqueID*(data.length/NUM_THREADS);
+        this.regionMax = (uniqueID+1)*(data.length/NUM_THREADS);
+        this.data = data;
+        this.shared = shared;
+        this.count = new int[shared.length()-1];
     }
 
     public void run () {
-
-    
-    float temp;
-    for(int i=0; i<data.length; i++){
-        float big = 100_000_000_000;
-        temp = data[i]*big;
-        if(temp < ((float)(1_000_000_000))*uniqueID || temp > ((float)(1_000_000_000))*(uniqueID+1)){
-            continue;
-        }
-        int temp2 = (int)(temp)/100;
-        checker[temp2]++;
-        map.put(temp2, data[i]);
+    //region -> [uniqueID/numThreads, (uniqueID+1)/numThreads)  
+    int temp;  
+    for(int i=regionMin; i<regionMax; i++){
+        checker.incrementAndGet((int)(data[i]*16777216));
+        //could theoretically result in data loss.
+        count[(int)(data[i]*count.length)]++;
     }
 
-    while(index.get() < uniqueID){
-        if(index.get() == uniqueID){
-            break;
-        }
+    for(int i=0; i<count.length; i++){
+        shared.addAndGet(i+1, count[i]);
     }
-    int index = 0;
-    for(int i=0; i<checker.length; i++){
-        if(checker[i] > 0){
-            for(int j=0; j<checker[i]; j++){
-                data[index] = map.get();
-                index++;
-            }
-        }
-    }
-
 
     }
 }
