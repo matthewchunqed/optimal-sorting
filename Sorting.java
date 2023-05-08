@@ -29,16 +29,23 @@ public class Sorting {
 
     public static void parallelSort (float[] data) {
         
-	    int NUM_THREADS = 16;
-    AtomicInteger lock = new AtomicInteger(0);
-    AtomicInteger index = new AtomicInteger(0);
-    Thread[] threads = new Thread[NUM_THREADS];
-    for(int i=0; i<NUM_THREADS; i++){
-        threads[i] = new Thread(new RThread(data, i, lock, index, NUM_THREADS));
+	int[] checker = new int[16777216];
+    float temp;
+    for(int i=0; i<data.length; i++){
+        temp = data[i]*16777216;
+        checker[(int)(data[i]*16777216)]++;
     }
-    for(int i=0; i<NUM_THREADS; i++){
-        threads[i].start();
+
+    int index = 0;
+    for(int i=0; i<checker.length; i++){
+        if(checker[i] > 0){
+            for(int j=0; j<checker[i]; j++){
+                data[index] = ((float)i)/16777216;
+                index++;
+            }
+        }
     }
+
 
     }
 
