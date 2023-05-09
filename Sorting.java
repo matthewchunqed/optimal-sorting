@@ -28,10 +28,9 @@ public class Sorting {
      */
 
     public static void parallelSort (float[] data) {
-    long time = System.nanoTime();
 
-    int NUM_THREADS_MAX = 8;
-	int NUM_THREADS = 8;
+    int NUM_THREADS_MAX = 32;
+	int NUM_THREADS = 32;
     AtomicIntegerArray count = new AtomicIntegerArray(NUM_THREADS_MAX+1);
     Thread[] threads = new Thread[NUM_THREADS_MAX];
     AtomicIntegerArray checker = new AtomicIntegerArray(16777216/8);
@@ -41,7 +40,6 @@ public class Sorting {
     for(int i=0; i<NUM_THREADS; i++){
         threads[i].start();
     }
-    System.out.println((System.nanoTime() - time) / 1_000_000);
     try{
         for(int i=0; i<NUM_THREADS; i++){
             threads[i].join();
@@ -49,7 +47,6 @@ public class Sorting {
     }catch(Exception e){
 
     }
-    System.out.println((System.nanoTime() - time) / 1_000_000);
 
     int start = 0;
     for(int i=0; i<NUM_THREADS_MAX; i++){
@@ -59,8 +56,7 @@ public class Sorting {
     for(int i=0; i<NUM_THREADS_MAX; i++){
         threads[i].start();
     }
-    System.out.println((System.nanoTime() - time) / 1_000_000);
-    //1300 ms between here
+    //500 ms between here
     try{
         for(int i=0; i<NUM_THREADS_MAX; i++){
             threads[i].join();
@@ -69,8 +65,6 @@ public class Sorting {
 
     }
     //and here
-    System.out.println((System.nanoTime() - time) / 1_000_000);
-    System.out.println();
 
     }
 

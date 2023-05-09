@@ -19,13 +19,14 @@ public class SThread implements Runnable {
     }
 
     public void run () {
-    //region -> [uniqueID/numThreads, (uniqueID+1)/numThreads)    
+    //region -> [uniqueID/numThreads, (uniqueID+1)/numThreads) 
     for(int i=regionMin; i<regionMax; i++){
-        if(checker.get(i) > 0){
-            for(int j=0; j<checker.get(i); j++){
-                data[start] = ((float)i)/(16777216/8);
-                //need to invert bijection now.
+        for(int j=0; j<8; j++){
+            if(((checker.get(i) >> (3*j)) % (1<<3)) > 0){
+            for(int k=0; k<((checker.get(i) >> (3*j)) % (1<<3)); k++){
+                data[start] = ((float)(i<<3)+j)/16777216;
                 start++;
+            }
             }
         }
     }
