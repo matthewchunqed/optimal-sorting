@@ -34,7 +34,7 @@ public class Sorting {
 	int NUM_THREADS = 8;
     AtomicIntegerArray count = new AtomicIntegerArray(NUM_THREADS_MAX+1);
     Thread[] threads = new Thread[NUM_THREADS_MAX];
-    AtomicIntegerArray checker = new AtomicIntegerArray(16777216);
+    AtomicIntegerArray checker = new AtomicIntegerArray(16777216/8);
     for(int i=0; i<NUM_THREADS; i++){
         threads[i] = new Thread(new RThread(data, i, checker, NUM_THREADS, count));
     }

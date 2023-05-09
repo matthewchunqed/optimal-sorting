@@ -24,8 +24,8 @@ public class RThread implements Runnable {
     //region -> [uniqueID/numThreads, (uniqueID+1)/numThreads)  
     int temp;  
     for(int i=regionMin; i<regionMax; i++){
-        checker.incrementAndGet((int)(data[i]*16777216));
-        //could theoretically result in data loss.
+        checker.addAndGet((int)(data[i]*16777216/8));
+        //want to reduce checker to 1/8th size -> so each int reps 8 diff. numbers
         count[(int)(data[i]*count.length)]++;
     }
 

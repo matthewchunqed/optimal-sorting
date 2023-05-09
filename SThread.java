@@ -12,8 +12,8 @@ public class SThread implements Runnable {
     public SThread(float[] data, int uniqueID, AtomicIntegerArray checker, int NUM_THREADS, int start) {
         this.checker = checker;
         this.uniqueID = uniqueID;
-        this.regionMin = uniqueID*(16777216/NUM_THREADS);
-        this.regionMax = (uniqueID+1)*(16777216/NUM_THREADS);
+        this.regionMin = uniqueID*((16777216/8)/NUM_THREADS);
+        this.regionMax = (uniqueID+1)*((16777216/8)/NUM_THREADS);
         this.data = data;
         this.start = start;
     }
@@ -23,7 +23,8 @@ public class SThread implements Runnable {
     for(int i=regionMin; i<regionMax; i++){
         if(checker.get(i) > 0){
             for(int j=0; j<checker.get(i); j++){
-                data[start] = ((float)i)/16777216;
+                data[start] = ((float)i)/(16777216/8);
+                //need to invert bijection now.
                 start++;
             }
         }
