@@ -33,7 +33,7 @@ public class Sorting {
 	int NUM_THREADS = 32;
     AtomicIntegerArray count = new AtomicIntegerArray(NUM_THREADS_MAX+1);
     Thread[] threads = new Thread[NUM_THREADS_MAX];
-    AtomicIntegerArray checker = new AtomicIntegerArray(16777216/8);
+    AtomicIntegerArray checker = new AtomicIntegerArray(2097152);
     for(int i=0; i<NUM_THREADS; i++){
         threads[i] = new Thread(new RThread(data, i, checker, NUM_THREADS, count));
     }
