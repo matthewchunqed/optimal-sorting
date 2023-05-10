@@ -1,7 +1,4 @@
 import java.util.Arrays;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RecursiveAction;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
 public class Sorting {
@@ -32,8 +29,11 @@ public class Sorting {
     int NUM_THREADS_MAX = 32;
 	int NUM_THREADS = 32;
     AtomicIntegerArray count = new AtomicIntegerArray(NUM_THREADS_MAX+1);
-    Thread[] threads = new Thread[NUM_THREADS_MAX];
     AtomicIntegerArray checker = new AtomicIntegerArray(2097152);
+    //instantiate the data structures for the frequency tracker and the counter for each thread's region of the frequency tracker.
+
+    Thread[] threads = new Thread[NUM_THREADS_MAX];
+    //create, run threads that populate the frequency tracker checker[].
     for(int i=0; i<NUM_THREADS; i++){
         threads[i] = new Thread(new RThread(data, i, checker, NUM_THREADS, count));
     }
@@ -49,6 +49,7 @@ public class Sorting {
     }
 
     int start = 0;
+    //create, run threads that parse the frequency tracker and populates data[] with sorted result.
     for(int i=0; i<NUM_THREADS_MAX; i++){
         start += count.get(i);
         threads[i] = new Thread(new SThread(data, i, checker, NUM_THREADS_MAX, start));
@@ -56,7 +57,7 @@ public class Sorting {
     for(int i=0; i<NUM_THREADS_MAX; i++){
         threads[i].start();
     }
-    //500 ms between here
+
     try{
         for(int i=0; i<NUM_THREADS_MAX; i++){
             threads[i].join();
@@ -64,7 +65,6 @@ public class Sorting {
     }catch(Exception e){
 
     }
-    //and here
 
     }
 
